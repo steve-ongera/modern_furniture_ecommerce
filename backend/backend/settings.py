@@ -42,6 +42,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -104,21 +105,102 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
+AUTH_USER_MODEL = 'users.User'
+ 
 LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
+TIME_ZONE = 'Africa/Nairobi'
 USE_I18N = True
-
 USE_TZ = True
-
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-
-STATIC_URL = 'static/'
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
-
+ 
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+ 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+ 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+ 
+# REST Framework
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ],
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
+        'rest_framework.filters.OrderingFilter',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 24,
+}
+ 
+# JWT
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
+    'ROTATE_REFRESH_TOKENS': True,
+}
+ 
+# CORS
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:5173",
+]
+CORS_ALLOW_CREDENTIALS = True
+ 
+# M-Pesa Configuration
+MPESA_DEBUG = DEBUG  # When True, uses sandbox; when False, uses production
+MPESA_CONSUMER_KEY = os.environ.get('MPESA_CONSUMER_KEY', 'your_consumer_key')
+MPESA_CONSUMER_SECRET = os.environ.get('MPESA_CONSUMER_SECRET', 'your_consumer_secret')
+MPESA_SHORTCODE = os.environ.get('MPESA_SHORTCODE', '174379')  # Sandbox default
+MPESA_PASSKEY = os.environ.get('MPESA_PASSKEY', 'your_passkey')
+MPESA_CALLBACK_URL = os.environ.get('MPESA_CALLBACK_URL', 'https://yourdomain.com/api/payments/mpesa/callback/')
+ 
+# Delivery fee base rates (KSh) per county
+DELIVERY_FEES = {
+    # Central Kenya
+    'Nairobi': 300,
+    'Kiambu': 400,
+    'Murang\'a': 600,
+    'Nyeri': 700,
+    'Kirinyaga': 650,
+    # Rift Valley
+    'Nakuru': 700,
+    'Uasin Gishu': 900,
+    'Trans Nzoia': 1000,
+    'Kericho': 850,
+    'Bomet': 900,
+    # Coast
+    'Mombasa': 1200,
+    'Kilifi': 1300,
+    'Kwale': 1400,
+    'Taita Taveta': 1500,
+    # Western
+    'Kisumu': 900,
+    'Kakamega': 1000,
+    'Bungoma': 1100,
+    'Siaya': 950,
+    # Eastern
+    'Meru': 800,
+    'Embu': 700,
+    'Kitui': 900,
+    'Machakos': 600,
+    'Makueni': 700,
+    # North Eastern
+    'Garissa': 1800,
+    'Wajir': 2000,
+    'Mandera': 2200,
+}
+ 
+# Pickup stations
+PICKUP_STATIONS = {
+    'nyeri': {'name': 'Nyeri Showroom', 'fee': 0, 'address': 'Nyeri Town'},
+    'nakuru': {'name': 'Nakuru Showroom', 'fee': 0, 'address': 'Nakuru Town'},
+    'nairobi': {'name': 'Nairobi Showroom | HQ', 'fee': 0, 'address': 'Ruiru, Behind Spur Mall'},
+}
+ 
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
